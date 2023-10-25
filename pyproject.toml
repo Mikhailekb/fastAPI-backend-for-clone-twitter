@@ -1,0 +1,61 @@
+[tool.poetry]
+name = "python-advanced-diploma"
+version = "0.1.0"
+description = ""
+authors = ["mikhail <appapa1012@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = { extras = ["all"], version = "^0.103.2" }
+SQLAlchemy = "^2.0.22"
+alembic = "^1.12.0"
+pillow = "^10.0.1"
+psycopg = { extras = ["binary"], version = "^3.1.12" }
+factory-boy = "^3.3.0"
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.2"
+isort = "^5.12.0"
+black = "^23.10.0"
+flake8 = "^6.1.0"
+flake8-pyproject = "^1.2.3"
+wemake-python-styleguide = "^0.18.0"
+mypy = "^1.6.0"
+types-factory-boy = "^0.4.1"
+types-pillow = "^10.1.0.0"
+trio = "^0.22.2"
+pytest-asyncio = "^0.21.1"
+pytest-env = "^1.0.1"
+
+
+[tool.isort]
+profile = "black"
+
+
+[tool.flake8]
+max-line-length = 88
+exclude = ["alembic/*", "backend/tests/*"]
+ignore = ["WPS432", "Q000", "WPS348", "DAR101", "WPS305", "WPS332", "E800",
+          "S311", "WPS306", "D106", "DAR201", "D205", "WPS226", "WPS404",
+          "WPS110", "D104", "WPS202", "DAR401", "WPS201", "D100", "B008",
+          "DAR301", "WPS473", "WPS412", "WPS410",]
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+
+[tool.pytest.ini_options]
+env = [
+    "DB_HOST=localhost",
+    "DB_NAME=test_db",
+    "POSTGRES_USER=postgres",
+    "POSTGRES_PASSWORD=postgres",
+    "MODE=TEST",
+]
+asyncio_mode = "auto"
