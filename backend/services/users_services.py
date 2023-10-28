@@ -1,5 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from backend.models import UserModel
 from backend.schemas import ExtendedUserSchema, UserSchema
 from backend.services.other_services import (
     get_full_name,
@@ -60,12 +61,11 @@ async def serialize_user_extended(
     return ExtendedUserSchema(
         id=user.id,
         name=get_full_name(user),
-        followers=[
-            UserSchema(id=follower.id, name=get_full_name(follower))
-            for follower in user.followers
-        ],
-        following=[
-            UserSchema(id=following.id, name=get_full_name(following))
-            for following in user.following
-        ],
+        followers=await users_to_schema(user.followers),
+        following=await users_to_schema(user.following),
     )
+
+
+async def users_to_schema(users: list[UserModel]) -> list[UserSchema]:
+    """Преобразует список UserModel в список UserSchema."""
+    return [UserSchema(id=user.id, name=get_full_name(user)) for user in users]

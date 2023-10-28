@@ -1,7 +1,5 @@
-from pathlib import Path
 from typing import Annotated
 
-import uvicorn
 from fastapi import Depends, FastAPI, Request, UploadFile
 from fastapi.openapi.utils import get_openapi
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -9,11 +7,12 @@ from starlette.responses import HTMLResponse, JSONResponse
 from starlette.staticfiles import StaticFiles
 from starlette.templating import Jinja2Templates
 
+from backend.config import STATIC_DIR
 from backend.models.db_helper import db_helper
 from backend.routes.tweets_routes import router as tweets_router
 from backend.routes.users_rouets import router as users_router
 from backend.schemas import Error, OutMediaSchema
-from backend.services.other_services import add_image_path_to_db, save_image
+from backend.services.medias_services import add_image_path_to_db, save_image
 from backend.services.security import get_user_id_from_api_key
 from backend.tests.factories import generate_data
 
@@ -21,11 +20,8 @@ app = FastAPI()
 
 app.include_router(tweets_router)
 app.include_router(users_router)
-
-static_dir = Path(__file__).parent.parent / "static"
-
-app.mount("/static", StaticFiles(directory=static_dir), name="static")
-templates = Jinja2Templates(directory=static_dir)
+app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+templates = Jinja2Templates(directory=STATIC_DIR)
 
 
 @app.get("/openapi.json", tags=["documentation"])
@@ -55,14 +51,20 @@ async def upload_image(
     session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ):
     """Загрузка изображения."""
+    error = Error(
+        error_type="Media Type error",
+        error_message="Only JPEG and PNG images are allowed.",
+    )
+
     if file.content_type not in {"image/jpeg", "image/png"}:
-        error = Error(
-            error_type="Media Type error",
-            error_message="Only JPEG and PNG images are allowed.",
-        )
         return JSONResponse(status_code=415, content=error.model_dump())
 
-    image_path = await save_image(file)
+    file_data = await file.read()
+    try:
+        image_path = await save_image(image=file_data)
+    except TypeError:
+        return JSONResponse(status_code=415, content=error.model_dump())
+
     image_id = await add_image_path_to_db(session=session, photo_path=image_path)
 
     return OutMediaSchema(media_id=image_id)
@@ -75,11 +77,9 @@ async def root(request: Request):
 
 
 @app.get("/test/generate_data")
-async def create_test_data():
+async def create_test_data(
+    session: AsyncSession = Depends(db_helper.scoped_session_dependency),
+):
     """Создание тестовых данных."""
-    await generate_data()
+    await generate_data(session=session)
     return {"result": True}
-
-
-if __name__ == "__main__":
-    uvicorn.run("main:app", host="127.0.0.1", port=5000, reload=True)

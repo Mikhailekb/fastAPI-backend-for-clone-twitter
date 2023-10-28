@@ -7,6 +7,11 @@ license = "MIT"
 readme = "README.md"
 
 
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+
 [tool.poetry.dependencies]
 python = "^3.11"
 fastapi = { extras = ["all"], version = "^0.103.2" }
@@ -27,7 +32,6 @@ wemake-python-styleguide = "^0.18.0"
 mypy = "^1.6.0"
 types-factory-boy = "^0.4.1"
 types-pillow = "^10.1.0.0"
-trio = "^0.22.2"
 pytest-asyncio = "^0.21.1"
 pytest-env = "^1.0.1"
 
@@ -44,10 +48,8 @@ ignore = ["WPS432", "Q000", "WPS348", "DAR101", "WPS305", "WPS332", "E800",
           "WPS110", "D104", "WPS202", "DAR401", "WPS201", "D100", "B008",
           "DAR301", "WPS473", "WPS412", "WPS410",]
 
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+[tool.mypy]
+exclude = ["backend/tests/*"]
 
 
 [tool.pytest.ini_options]

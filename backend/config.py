@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Final
 
 from pydantic_settings import BaseSettings
@@ -25,3 +26,5 @@ class Settings(BaseSettings):
 settings = Settings()
 
 MAX_NUMBER: Final[int] = 2147483647
+BASE_DIR = Path(__name__).parent.parent
+STATIC_DIR = BASE_DIR / "static"

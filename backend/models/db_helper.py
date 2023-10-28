@@ -34,8 +34,13 @@ class DatabaseHelper:
             scopefunc=current_task,
         )
 
+    async def session_dependency(self) -> AsyncGenerator[AsyncSession, None]:
+        """Возвращает генератор с асинхронной сессией."""
+        async with self.session_factory() as session:
+            yield session
+
     async def scoped_session_dependency(self) -> AsyncGenerator[AsyncSession, None]:
-        """Возвращает генераторное выражение с асинхронной сессией."""
+        """Возвращает генератор с сессией с ограниченной областью действия."""
         session = self.get_scoped_session()
         yield session
         await session.close()

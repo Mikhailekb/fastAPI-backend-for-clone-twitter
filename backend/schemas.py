@@ -36,9 +36,9 @@ class TweetSchema(BaseModel):
 
     id: int = Field(gt=0, le=MAX_NUMBER)
     content: str = Field(max_length=500, min_length=1)
-    attachments: list[str] | None = None
+    attachments: list[str] = Field(default_factory=list)
     author: UserSchema
-    likes: list[TweetLikesSchema] | None = None
+    likes: list[TweetLikesSchema] = Field(default_factory=list)
 
 
 class Error(BaseModel):

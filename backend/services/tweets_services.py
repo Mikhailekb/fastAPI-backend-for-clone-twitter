@@ -1,14 +1,15 @@
-from sqlalchemy import delete, or_, select
+from sqlalchemy import delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.models.tweets import TweetModel
 from backend.schemas import CreateTweetSchema, TweetLikesSchema, TweetSchema, UserSchema
+from backend.services.medias_services import get_images_obj_from_ids
 from backend.services.other_services import (
     get_full_name,
-    get_images_obj_from_ids,
     get_tweet,
     get_user_with_following,
     get_user_with_liked_tweets,
+    get_user_with_tweets,
 )
 
 
@@ -71,7 +72,7 @@ async def add_like_to_tweet_db(
     await session.commit()
 
 
-async def delete_like_tweet_db(
+async def remove_like_from_tweet_db(
     session: AsyncSession,
     user_id: int,
     tweet_id: int,
@@ -99,21 +100,15 @@ async def get_tweet_feed_db(session: AsyncSession, user_id: int) -> list[TweetMo
     :raise ValueError: Если пользователь не найден.
     """
     user = await get_user_with_following(session, user_id)
-    following_ids = [following_user.id for following_user in user.following]
 
-    stmt = (
-        select(TweetModel)
-        .where(
-            or_(
-                TweetModel.author_id.in_(following_ids),
-                TweetModel.author_id == user_id,
-            ),
-        )
-        .order_by(TweetModel.count_likes.desc())
-    )
-    tweets = await session.scalars(stmt)
+    following_user_tweets = []
+    for following_user in user.following:
+        following_user = await get_user_with_tweets(session, following_user.id)
+        following_user_tweets.extend(following_user.tweets)
 
-    return list(tweets.unique().all())
+    following_user_tweets.sort(key=lambda tweet: tweet.count_likes, reverse=True)
+
+    return following_user_tweets
 
 
 async def serialize_tweets(tweets: list[TweetModel]) -> list[TweetSchema]:
@@ -126,7 +121,7 @@ async def serialize_tweets(tweets: list[TweetModel]) -> list[TweetSchema]:
             attachments=[image.image_path for image in tweet.images],
             author=UserSchema(
                 id=tweet.author.id,
-                name=tweet.author.first_name,
+                name=get_full_name(tweet.author),
             ),
             likes=[
                 TweetLikesSchema(
