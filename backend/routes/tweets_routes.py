@@ -18,9 +18,9 @@ from backend.services.security import get_user_id_from_api_key
 from backend.services.tweets_services import (
     add_like_to_tweet_db,
     create_tweet_db,
-    delete_like_tweet_db,
     delete_tweet_db,
     get_tweet_feed_db,
+    remove_like_from_tweet_db,
     serialize_tweets,
 )
 
@@ -97,7 +97,7 @@ async def delete_tweet(
     response_model=BaseResponse,
     responses={404: {"model": Error}},
 )
-async def like_tweet(
+async def add_like_to_tweet(
     tweet_id: Annotated[int, Path(gt=0, le=MAX_NUMBER)],
     current_user_id: Annotated[int, Depends(get_user_id_from_api_key)],
     session: AsyncSession = Depends(db_helper.scoped_session_dependency),
@@ -121,14 +121,14 @@ async def like_tweet(
     response_model=BaseResponse,
     responses={404: {"model": Error}},
 )
-async def delete_like_tweet(
+async def remove_like_from_tweet(
     tweet_id: Annotated[int, Path(gt=0, le=MAX_NUMBER)],
     current_user_id: Annotated[int, Depends(get_user_id_from_api_key)],
     session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ):
     """Удаление своего лайка к твиту."""
     try:
-        await delete_like_tweet_db(
+        await remove_like_from_tweet_db(
             session=session,
             user_id=current_user_id,
             tweet_id=tweet_id,

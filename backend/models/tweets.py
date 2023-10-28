@@ -1,11 +1,10 @@
 from typing import TYPE_CHECKING
 
-from sqlalchemy import ForeignKey, String, func, select
+from sqlalchemy import ForeignKey, String
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from backend.models.base import Base
-from backend.models.likes_tweets import TweetLikes
 
 if TYPE_CHECKING:
     from backend.models.images import ImageModel
@@ -34,9 +33,5 @@ class TweetModel(Base):
 
     @hybrid_property
     def count_likes(self):
-        """Количество лайков у твита."""
-        return (
-            select(func.count(TweetLikes.tweet_id))
-            .where(TweetLikes.tweet_id == self.id)
-            .label("count_likes")
-        )
+        """Подсчитывает количество лайков у данного твита."""
+        return len(self.liked_by)
