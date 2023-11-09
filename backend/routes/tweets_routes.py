@@ -38,7 +38,7 @@ async def add_tweet(
     current_user_id: Annotated[int, Depends(get_user_id_from_api_key)],
     session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ):
-    """Создание твита."""
+    """Create a tweet."""
     try:
         tweet_id = await create_tweet_db(
             session=session,
@@ -57,7 +57,7 @@ async def get_tweet_feed(
     current_user_id: Annotated[int, Depends(get_user_id_from_api_key)],
     session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ):
-    """Получение ленты твитов."""
+    """Get a tweet feed."""
     model_tweets = await get_tweet_feed_db(session=session, user_id=current_user_id)
     tweets = await serialize_tweets(model_tweets)
 
@@ -74,7 +74,7 @@ async def delete_tweet(
     current_user_id: Annotated[int, Depends(get_user_id_from_api_key)],
     session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ):
-    """Удаление своего твита."""
+    """Delete your tweet."""
     try:
         tweet = await get_tweet(session=session, tweet_id=tweet_id)
     except ValueError as exc:
@@ -102,7 +102,7 @@ async def add_like_to_tweet(
     current_user_id: Annotated[int, Depends(get_user_id_from_api_key)],
     session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ):
-    """Добавление лайка к твиту."""
+    """Adding a like to a tweet."""
     try:
         await add_like_to_tweet_db(
             session=session,
@@ -126,7 +126,7 @@ async def remove_like_from_tweet(
     current_user_id: Annotated[int, Depends(get_user_id_from_api_key)],
     session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ):
-    """Удаление своего лайка к твиту."""
+    """Delete your like on a tweet."""
     try:
         await remove_like_from_tweet_db(
             session=session,

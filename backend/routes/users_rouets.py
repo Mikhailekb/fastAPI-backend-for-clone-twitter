@@ -27,7 +27,7 @@ async def add_follow_user(
     current_user_id: Annotated[int, Depends(get_user_id_from_api_key)],
     session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ):
-    """Создание подписки на пользователя."""
+    """Create a subscription for a user."""
     if current_user_id == user_id:
         error = Error(error_type="Forbidden", error_message="Can't follow yourself")
         return JSONResponse(status_code=403, content=error.model_dump())
@@ -55,7 +55,7 @@ async def delete_follow_user(
     current_user_id: Annotated[int, Depends(get_user_id_from_api_key)],
     session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ):
-    """Удаление подписки на пользователя."""
+    """Delete a subscription to a user."""
     try:
         await delete_follow_user_db(
             session=session,
@@ -74,7 +74,7 @@ async def get_me_info(
     info: Annotated[int | dict, Depends(get_user_id_from_api_key)],
     session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ) -> OutUserSchema | dict:
-    """Получение информации об текущем пользователе."""
+    """Get information about the current user."""
     if isinstance(info, dict):
         return info
 
@@ -93,7 +93,7 @@ async def get_user_info(
     _: Annotated[int, Depends(get_user_id_from_api_key)],
     session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ):
-    """Получение информации об указанном пользователе."""
+    """Get information about the specified user."""
     try:
         user = await serialize_user_extended(session=session, user_id=user_id)
     except ValueError as exc:

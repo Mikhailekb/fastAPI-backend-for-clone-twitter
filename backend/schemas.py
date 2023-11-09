@@ -4,45 +4,59 @@ from backend.config import MAX_NUMBER
 
 
 class CreateTweetSchema(BaseModel):
-    """Схема для создания твита."""
+    """Schema for creating a tweet."""
 
     tweet_data: str = Field(max_length=500, min_length=1)
-    tweet_media_ids: list[int] | None = None
+    tweet_media_ids: list[int] = Field(
+        default_factory=list,
+        description="An array with media file ids. "
+        "Media is created via endpoint /api/medias",
+    )
 
 
 class UserSchema(BaseModel):
-    """Базовая схема пользователя."""
+    """Basic user schema."""
 
     id: int = Field(ge=0, le=MAX_NUMBER)
-    name: str
+    name: str = Field(
+        max_length=101,
+        description="Full name (first_name + last_name) of the user",
+    )
 
 
 class ExtendedUserSchema(UserSchema):
-    """Расширенная схема пользователя."""
+    """Extended user schema."""
 
     followers: list[UserSchema] = Field(default_factory=list)
     following: list[UserSchema] = Field(default_factory=list)
 
 
 class TweetLikesSchema(BaseModel):
-    """Схема лайка у твита."""
+    """Tweet like scheme."""
 
     user_id: int = Field(gt=0, le=MAX_NUMBER)
-    name: str
+    name: str = Field(
+        max_length=101,
+        description="Full name (first_name + last_name) of the user"
+        " who liked the tweet",
+    )
 
 
 class TweetSchema(BaseModel):
-    """Схема твита."""
+    """Tweet scheme."""
 
     id: int = Field(gt=0, le=MAX_NUMBER)
     content: str = Field(max_length=500, min_length=1)
-    attachments: list[str] = Field(default_factory=list)
+    attachments: list[str] = Field(
+        default_factory=list,
+        description="Array of paths with media",
+    )
     author: UserSchema
     likes: list[TweetLikesSchema] = Field(default_factory=list)
 
 
 class Error(BaseModel):
-    """Схема пользовательской ошибки."""
+    """User error schema."""
 
     result: bool = False
     error_type: str
@@ -50,30 +64,30 @@ class Error(BaseModel):
 
 
 class BaseResponse(BaseModel):
-    """Схема базового успешного ответа."""
+    """Basic successful response schema."""
 
     result: bool = True
 
 
 class OutUserSchema(BaseResponse):
-    """Схема ответа с информацией о пользователе."""
+    """Response scheme with user information."""
 
     user: ExtendedUserSchema
 
 
 class OutTweetIDSchema(BaseResponse):
-    """Схема ответа с информацией о id твита."""
+    """Response scheme with information about tweet id."""
 
     tweet_id: int = Field(gt=0, le=MAX_NUMBER)
 
 
 class OutTweetsSchema(BaseResponse):
-    """Схема ответа с твитами."""
+    """Response scheme with tweets."""
 
     tweets: list[TweetSchema]
 
 
 class OutMediaSchema(BaseResponse):
-    """Схема ответа с id медиа."""
+    """Response scheme with media id."""
 
     media_id: int = Field(gt=0, le=MAX_NUMBER)

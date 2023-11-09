@@ -16,9 +16,9 @@ build-backend = "poetry.core.masonry.api"
 python = "^3.11"
 fastapi = { extras = ["all"], version = "^0.103.2" }
 SQLAlchemy = "^2.0.22"
+psycopg = { extras = ["binary"], version = "^3.1.12" }
 alembic = "^1.12.0"
 pillow = "^10.0.1"
-psycopg = { extras = ["binary"], version = "^3.1.12" }
 factory-boy = "^3.3.0"
 
 
@@ -46,7 +46,7 @@ exclude = ["alembic/*", "backend/tests/*"]
 ignore = ["WPS432", "Q000", "WPS348", "DAR101", "WPS305", "WPS332", "E800",
           "S311", "WPS306", "D106", "DAR201", "D205", "WPS226", "WPS404",
           "WPS110", "D104", "WPS202", "DAR401", "WPS201", "D100", "B008",
-          "DAR301", "WPS473", "WPS412", "WPS410",]
+          "DAR301", "WPS473", "WPS412", "WPS410", "WPS326"]
 
 [tool.mypy]
 exclude = ["backend/tests/*"]

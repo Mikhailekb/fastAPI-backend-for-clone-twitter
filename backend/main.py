@@ -28,7 +28,7 @@ templates = Jinja2Templates(directory=STATIC_DIR)
 async def get_open_api_endpoint(
     _: Annotated[int, Depends(get_user_id_from_api_key)],
 ) -> JSONResponse:
-    """Получение OpenAPI схемы."""
+    """Get OpenAPI schema."""
     return JSONResponse(
         get_openapi(
             title="FastAPI security test",
@@ -50,7 +50,7 @@ async def upload_image(
     _: Annotated[int, Depends(get_user_id_from_api_key)],
     session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ):
-    """Загрузка изображения."""
+    """Upload an image. Expects a JPEG or PNG image."""
     error = Error(
         error_type="Media Type error",
         error_message="Only JPEG and PNG images are allowed.",
@@ -72,7 +72,7 @@ async def upload_image(
 
 @app.get("/", response_class=HTMLResponse)
 async def root(request: Request):
-    """Страница с пользовательским интерфейсом."""
+    """User interface page."""
     return templates.TemplateResponse("index.html", {"request": request})
 
 
@@ -80,6 +80,6 @@ async def root(request: Request):
 async def create_test_data(
     session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ):
-    """Создание тестовых данных."""
+    """Create test data."""
     await generate_data(session=session)
     return {"result": True}

@@ -45,7 +45,7 @@ async def test_create_tweet_db(db: AsyncSession, user: UserModel):
     tweet_id = await create_tweet_db(
         session=db,
         user_id=user.id,
-        tweet_data=CreateTweetSchema(tweet_data=tweet_data, tweet_media_ids=None),
+        tweet_data=CreateTweetSchema(tweet_data=tweet_data),
     )
 
     res_tweet = await get_tweet(db, tweet_id)
